@@ -11,7 +11,7 @@ all:
               ansible_user: ${admin_user}
               ansible_port: ${ansible_port}
               ansible_python_interpreter: ${ansible_python_interpreter}
-              ansible_become_method: doas
+              ansible_become_method: sudo
               domain_name: ${domain_name}
               system_timezone: ${system_timezone}
               vpc_ip: ${node.interface[0].ipv4[0].vpc}

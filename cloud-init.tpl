@@ -2,8 +2,7 @@
 # user configuration
 users:
   - name: ${admin_user}
-    doas:
-      - "permit nopass ${admin_user} as root"
+    sudo: ALL=(ALL) NOPASSWD:ALL
     groups: wheel
     shell: /bin/bash
     ssh_authorized_keys:
@@ -17,7 +16,7 @@ package_reboot_if_required: true
 
 # base packages
 packages:
-  - doas
+  - sudo
   - bash
   - bash-completion
   - grep
@@ -27,22 +26,18 @@ packages:
   - vim
   - python3
   - iproute2
+  - ca-certificates
+  - unattended-upgrades
+  - apt-listchanges
 
 # system configuration commands
 runcmd:
   # ensure user is unlocked 
   - usermod -p '*' ${admin_user}
   
-  # create sudo alias for doas
-  - echo "alias sudo='doas'" >> /etc/profile.d/doas-alias.sh
-  - chmod +x /etc/profile.d/doas-alias.sh
-  
-  # create sudo symlink for doas
-  - ln -sf /usr/bin/doas /usr/bin/sudo
-  
-  # ssh service management
-  - rc-update add sshd default
-  - rc-service sshd start
+  # ssh service management - support both Alpine and Debian-style systems
+  - rc-update add sshd default || systemctl enable sshd
+  - rc-service sshd start || systemctl start sshd
   
   # ssh hardening
   - sed -i '/Port/d' /etc/ssh/sshd_config
@@ -75,13 +70,8 @@ runcmd:
 
   - chmod 600 /etc/ssh/sshd_config
 
-  - rc-service sshd restart
-  
-  # kernel update check
-  - if [ "$(uname -r)" != "$(ls -1 /lib/modules/ | grep -v grub | sort -V | tail -n1)" ]; then
-      echo "reboot required due to kernel update";
-      reboot;
-    fi
+  # Restart SSH service - support both Alpine and Debian-style systems
+  - rc-service sshd restart || systemctl restart sshd
   
   # cloud-init verification
   - echo "cloud-init schema"
