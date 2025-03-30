@@ -1,0 +1,3 @@
+TERRAFORM_HOST=app.terraform.io
+TERRAFORM_ORGANIZATION=my_organization
+TERRAFORM_WORKSPACE=my_workspace

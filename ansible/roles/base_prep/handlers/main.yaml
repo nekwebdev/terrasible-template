@@ -1,0 +1,12 @@
+---
+- name: Restart crond after setting the timezone
+  ansible.builtin.service:
+    name: crond
+    state: restarted
+  listen: "restart crond"
+
+- name: Restart networking after configuring interface
+  ansible.builtin.service:
+    name: networking
+    state: restarted
+  listen: "restart networking"

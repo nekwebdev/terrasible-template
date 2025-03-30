@@ -1,0 +1,40 @@
+---
+galaxy_info:
+  author: nekwebdev
+  description: System hardening role for Alpine and Debian systems
+  company: nekwebdev
+  license: GPLv3
+  min_ansible_version: 2.9
+  
+  platforms:
+    - name: Alpine
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+
+  galaxy_tags:
+    - system
+    - security
+    - hardening
+    - ssh
+    - fail2ban
+
+dependencies: []
+
+argument_specs:
+  main:
+    short_description: System security hardening
+    description: >
+      This role performs system security hardening tasks including SSH configuration,
+      fail2ban setup, kernel parameter hardening, and filesystem security measures
+      for Alpine and Debian-based systems.
+    options:
+      ansible_port:
+        description: SSH port to be configured in sshd_config and fail2ban rules
+        type: int
+        required: true

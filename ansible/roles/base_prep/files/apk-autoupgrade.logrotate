@@ -1,0 +1,10 @@
+/var/log/apk-autoupgrade.log {
+  daily
+  minsize 10M
+  rotate 7
+  compress
+  delaycompress
+  missingok
+  notifempty
+  copytruncate
+} 

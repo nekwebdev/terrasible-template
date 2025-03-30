@@ -1,0 +1,79 @@
+---
+- name: Alpine - fail2ban configuration
+  ansible.builtin.include_tasks: alpine_fail2ban.yaml
+  when: ansible_facts['os_family'] == "Alpine"
+  tags: always
+
+- name: Debian - fail2ban configuration
+  ansible.builtin.include_tasks: debian_fail2ban.yaml
+  when: ansible_facts['os_family'] == "Debian"
+  tags: always
+
+# double up on the cloud-init sshd hardening
+- name: Ensure sshd_config is configured with strict settings
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    owner: root
+    group: root
+    mode: '0600'
+  loop:
+    - { regexp: '^#?Port ', line: 'Port {{ ansible_port }}' }
+    - { regexp: '^#?PubkeyAuthentication ', line: 'PubkeyAuthentication yes' }
+    - { regexp: '^#?PermitRootLogin ', line: 'PermitRootLogin no' }
+    - { regexp: '^#?PasswordAuthentication ', line: 'PasswordAuthentication no' }
+    - { regexp: '^#?ChallengeResponseAuthentication ', line: 'ChallengeResponseAuthentication no' }
+    - { regexp: '^#?PermitEmptyPasswords ', line: 'PermitEmptyPasswords no' }
+    - { regexp: '^#?MaxAuthTries ', line: 'MaxAuthTries 3' }
+    - { regexp: '^#?LoginGraceTime ', line: 'LoginGraceTime 30' }
+    - { regexp: '^#?ClientAliveInterval ', line: 'ClientAliveInterval 30' }
+    - { regexp: '^#?ClientAliveCountMax ', line: 'ClientAliveCountMax 10' }
+    - { regexp: '^#?Compression ', line: 'Compression no' }
+    - { regexp: '^#?MaxSessions ', line: 'MaxSessions 2' }
+    - { regexp: '^#?X11Forwarding ', line: 'X11Forwarding no' }
+  notify: restart sshd
+  tags: always
+
+# disable unused filesystems
+- name: Ensure unused filesystems are disabled
+  ansible.builtin.blockinfile:
+    path: /etc/modprobe.d/disable-filesystems.conf
+    state: present
+    create: yes
+    insertafter: EOF
+    owner: root
+    group: root
+    mode: '0644'
+    block: |
+      install cramfs /bin/true
+      install freevxfs /bin/true
+      install jffs2 /bin/true
+      install hfs /bin/true
+      install hfsplus /bin/true
+      install squashfs /bin/true
+      install udf /bin/true
+      install vfat /bin/true
+  notify: restart system
+
+# harden kernel parameters
+- name: Harden kernel parameters
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/00-hardening.conf
+    state: present
+    reload: yes
+  loop:
+    - { name: 'net.ipv4.ip_forward', value: '0' }
+    - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
+    - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.all.secure_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
+    - { name: 'net.ipv4.conf.default.log_martians', value: '1' }
+    - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+    - { name: 'net.ipv4.icmp_ignore_bogus_error_responses', value: '1' }
+    - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+    - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.default.send_redirects', value: '0' }

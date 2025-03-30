@@ -1,0 +1,19 @@
+# Required variables
+linode_token        = "paste_linode_token"
+cloudflare_token    = "paste_cloudflare_token"
+cloudflare_zone_id  = "paste_cloudflare_zone_id"
+domain_name         = "example.com"
+ssh_admin_key       = "paste_admin_ssh_public_key"
+ssh_services_key    = "paste_ansible_ssh_public_key"
+
+# Optional variables with defaults
+project_name        = "your_project_name"       # Default: project_name
+server_count        = 1                         # Default: 1
+linode_region       = "us-lax"                  # Default: us-lax
+server_type         = "g6-nanode-1"             # Default: g6-nanode-1
+system_timezone     = "America/Los_Angeles"     # Default: America/Los_Angeles
+vpc_subnet          = "10.10.10"                # Default: 10.10.10
+root_password       = "paste_root_password"     # Required if not using random passwords
+admin_user          = "admin"                   # Default: admin
+ssh_port            = 22                        # Default: 22
+ansible_python_interpreter = "/usr/bin/python3" # Default: /usr/bin/python3

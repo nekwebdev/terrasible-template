@@ -1,0 +1,26 @@
+[sshd]
+enabled  = true
+filter   = alpine-sshd
+port     = {{ ansible_port }}
+logpath = /var/log/messages
+maxretry = 3
+findtime = 300
+bantime = 3600
+
+[sshd-ddos]
+enabled  = true
+filter   = alpine-sshd-ddos
+port     = {{ ansible_port }}
+logpath = /var/log/messages
+maxretry = 3
+findtime = 300
+bantime = 3600
+
+[sshd-key]
+enabled  = true
+filter   = alpine-sshd-key
+port     = {{ ansible_port }}
+logpath = /var/log/messages
+maxretry = 3
+findtime = 300
+bantime = 3600

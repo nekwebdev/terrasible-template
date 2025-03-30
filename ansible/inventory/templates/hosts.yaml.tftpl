@@ -1,0 +1,18 @@
+---
+all:
+  children:
+    cluster:
+      children:
+        master:
+          hosts:
+%{ for idx, node in servers ~}
+            ${node.label}:
+              ansible_host: ${node.ip_address}
+              ansible_user: ${admin_user}
+              ansible_port: ${ansible_port}
+              ansible_python_interpreter: ${ansible_python_interpreter}
+              ansible_become_method: doas
+              domain_name: ${domain_name}
+              system_timezone: ${system_timezone}
+              vpc_ip: ${node.interface[0].ipv4[0].vpc}
+%{ endfor ~}

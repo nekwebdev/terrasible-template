@@ -1,0 +1,22 @@
+---
+- name: Ensure system hostname is set to {{ inventory_hostname }}.{{ domain_name }}
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}.{{ domain_name }}"
+  tags: always
+
+- name: Ensure /etc/hosts is configured
+  block:
+    - name: Ensure hosts entry for 127.0.0.1 includes localhost and {{ inventory_hostname }}.{{ domain_name }}
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.0\.1'
+        line: '127.0.0.1 localhost localhost.localdomain {{ inventory_hostname }} {{ inventory_hostname }}.{{ domain_name }}'
+        state: present
+
+    - name: Ensure hosts entry for ::1 includes localhost6 and {{ inventory_hostname }}.{{ domain_name }}
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^::1'
+        line: '::1 localhost localhost.localdomain {{ inventory_hostname }} {{ inventory_hostname }}.{{ domain_name }}'
+        state: present
+  tags: always

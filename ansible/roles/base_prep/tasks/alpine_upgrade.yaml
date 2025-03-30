@@ -1,0 +1,71 @@
+---
+# Alpine specific tasks
+# https://www.cyberciti.biz/faq/how-to-reboot-alpine-linux-using-ansible-when-kernel-is-updated/
+
+- name: Check running kernel version
+  ansible.builtin.shell: uname -r
+  register: running_kernel
+  changed_when: false
+  tags: always
+
+- name: Ensure package cache is updated
+  community.general.apk:
+    update_cache: yes
+  changed_when: false
+  tags: always
+
+- name: Ensure packages are upgraded
+  community.general.apk:
+    upgrade: yes
+  tags: always
+
+- name: Ensure basic packages are installed
+  community.general.apk:
+    name:
+      - bash-completion
+      - curl
+      - htop
+      - vim
+      - git
+      - grep
+      - iproute2-ss
+      - logrotate
+    state: present
+  tags: always
+
+- name: Check installed kernel version after upgrade
+  ansible.builtin.shell: ls -1 /lib/modules/ | grep -v grub | sort -V | tail -n1
+  register: latest_kernel
+  changed_when: false
+  tags: always
+
+- name: Reboot the system if a kernel update is installed
+  ansible.builtin.reboot:
+    msg: "Reboot initiated by Ansible for kernel updates"
+    connect_timeout: 5
+    reboot_timeout: 1200
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: whoami
+  when: running_kernel.stdout != latest_kernel.stdout
+  tags: always
+
+- name: Ensure apk auto upgrade script is present
+  ansible.builtin.copy:
+    src: files/apk-autoupgrade
+    dest: /etc/periodic/daily/apk-autoupgrade
+    owner: root
+    group: root
+    mode: '0700'
+  notify: restart crond
+  tags: always
+
+- name: Ensure logrotate config for apk auto upgrade script is present
+  ansible.builtin.copy:
+    src: files/apk-autoupgrade.logrotate
+    dest: /etc/logrotate.d/apk-autoupgrade
+    owner: root
+    group: root
+    mode: '0644'
+  tags: always
+

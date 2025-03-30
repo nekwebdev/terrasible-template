@@ -1,0 +1,46 @@
+---
+# Debian specific tasks
+- name: Ensure cache is updated and all packages are upgraded
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true
+  tags: always
+
+- name: Ensure basic packages are installed
+  ansible.builtin.apt:
+    name:
+      - bash-completion
+      - curl
+      - htop
+      - vim
+      - git
+      - grep
+      - iproute2
+      - logrotate
+      - unattended-upgrades
+    state: present
+  tags: always
+
+- name: Ensure unattended-upgrades is enabled and started
+  ansible.builtin.systemd:
+    name: unattended-upgrades
+    state: started
+    enabled: yes
+  tags: always
+
+- name: Check if reboot is required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: reboot_required_file
+  tags: always
+
+- name: Reboot the system if required
+  ansible.builtin.reboot:
+    msg: "Reboot initiated by Ansible due to package updates"
+    connect_timeout: 5
+    reboot_timeout: 1200
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: whoami
+  when: reboot_required_file.stat.exists | default(false)
+  tags: always

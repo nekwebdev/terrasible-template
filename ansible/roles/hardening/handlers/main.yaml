@@ -1,0 +1,22 @@
+---
+- name: Restart sshd after hardening
+  ansible.builtin.service:
+    name: sshd
+    state: restarted 
+  listen: "restart sshd"
+
+- name: Restart fail2ban after config changes
+  ansible.builtin.service:
+    name: fail2ban
+    state: restarted
+  listen: "restart fail2ban"
+
+- name: Restart system
+  ansible.builtin.reboot:
+    msg: "Reboot initiated by Ansible for kernel parameter changes"
+    connect_timeout: 5
+    reboot_timeout: 1200
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: whoami
+  listen: "restart system"

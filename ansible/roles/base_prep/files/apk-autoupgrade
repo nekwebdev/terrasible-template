@@ -1,0 +1,21 @@
+#!/bin/sh
+# check for kernel updates and upgrade system
+kernel_before=$(uname -r)
+apk upgrade --update | sed "s/^/[`date`] /" > /tmp/apk-autoupgrade-lastrun.log
+
+# check for service updates
+updated_services=$(grep "updated from" /tmp/apk-autoupgrade-lastrun.log | awk '{print $5}' | sed 's/^\(.*\)$/\1/')
+for service in $updated_services; do
+  if service=$(pgrep -f "$service"); then
+    echo "Restarting $service due to update" >> /tmp/apk-autoupgrade-lastrun.log
+    service $service restart || systemctl restart $service || rc-service $service restart
+  fi
+done
+cat /tmp/apk-autoupgrade-lastrun.log >> /var/log/apk-autoupgrade.log
+
+# check for kernel updates
+kernel_after=$(ls -1 /lib/modules/ | grep -v grub | sort -V | tail -n1)
+if [ "$kernel_before" != "$kernel_after" ]; then
+  echo "Rebooting for kernel update from $kernel_before to $kernel_after" >> /var/log/apk-autoupgrade.log
+  reboot
+fi

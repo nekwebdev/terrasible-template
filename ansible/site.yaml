@@ -1,0 +1,15 @@
+# prepare nodes for cluster
+---
+- name: Prepare cluster
+  hosts: cluster
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: System base preparation
+      include_role:
+        name: base_prep
+
+    - name: System hardening
+      include_role:
+        name: hardening

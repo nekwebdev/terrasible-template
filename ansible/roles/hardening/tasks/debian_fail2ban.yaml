@@ -1,0 +1,42 @@
+---
+# install and configure fail2ban
+- name: Ensure fail2ban is installed
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+    update_cache: true
+  tags: always
+
+- name: Ensure fail2ban configuration directory exists
+  ansible.builtin.file:
+    path: /etc/fail2ban/jail.d
+    state: directory
+    mode: '0755'
+  tags: always
+
+- name: Ensure fail2ban is enabled and started
+  ansible.builtin.service:
+    name: fail2ban
+    enabled: yes
+    state: started
+  tags: always
+
+- name: Ensure fail2ban defaults are configured
+  ansible.builtin.copy:
+    src: files/debian-jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fail2ban
+  tags: always
+
+- name: Ensure SSH jail is configured
+  ansible.builtin.template:
+    src: templates/debian-sshd.conf.j2
+    dest: /etc/fail2ban/jail.d/sshd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fail2ban
+  tags: always

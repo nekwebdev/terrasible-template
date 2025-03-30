@@ -1,0 +1,44 @@
+---
+galaxy_info:
+  author: nekwebdev
+  description: Base system preparation role for Alpine and Debian systems
+  company: nekwebdev
+  license: GPLv3
+  min_ansible_version: 2.9
+  
+  platforms:
+    - name: Alpine
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+
+  galaxy_tags:
+    - system
+    - setup
+    - base
+    - configuration
+
+dependencies: []
+
+argument_specs:
+  main:
+    short_description: System base preparation
+    description: >
+      This role performs basic system preparation tasks including package management,
+      timezone configuration, networking setup, and system updates for Alpine and Debian-based systems.
+    options:
+      system_timezone:
+        description: Timezone to be set on all nodes (e.g. UTC, Europe/London, America/New_York)
+        type: str
+        required: true
+      domain_name:
+        description: >
+          Domain name to be set for hostname and /etc/hosts configuration.
+          Used to set FQDN as inventory_hostname.domain_name.
+        type: str
+        required: true

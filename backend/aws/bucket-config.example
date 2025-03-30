@@ -1,0 +1,23 @@
+[default]
+region = us-west-1
+bucket = bucket-name
+dynamodb = terraform-state-locks
+key = myproject/terraform.tfstate
+environment = default
+project = myproject
+
+[profiles staging]
+region = us-east-1
+bucket = bucket-name-staging
+dynamodb = terraform-state-locks-staging
+key = myproject/terraform.tfstate 
+environment = staging
+project = myproject
+
+[profiles production]
+region = us-east-2
+bucket = bucket-name-production
+dynamodb = terraform-state-locks-production
+key = myproject/terraform.tfstate
+environment = production
+project = myproject

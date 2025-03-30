@@ -1,0 +1,31 @@
+---
+- name: Ensure Ansible temp directory exists with correct permissions
+  ansible.builtin.file:
+    path: "/tmp/.ansible/tmp"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0700'
+  tags: always
+
+- name: Ensure timezone is set to {{ system_timezone }}
+  community.general.timezone:
+    name: "{{ system_timezone }}"
+  when: (system_timezone is defined)
+  notify: restart crond
+  tags: always
+  
+- name: Alpine - Basic package upgrades
+  ansible.builtin.include_tasks: alpine_upgrade.yaml
+  when: ansible_facts['os_family'] == "Alpine"
+  tags: always
+
+- name: Debian - Basic package upgrades
+  ansible.builtin.include_tasks: debian_upgrade.yaml
+  when: ansible_facts['os_family'] == "Debian"
+  tags: always
+
+- name: Networking basic configuration
+  ansible.builtin.include_tasks: networking.yaml
+  when: (domain_name is defined)
+  tags: always
