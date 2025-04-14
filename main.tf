@@ -38,7 +38,7 @@ resource "linode_vpc_subnet" "servers_subnet" {
 resource "linode_instance" "servers_nodes" {
   count       = var.server_count
   region      = var.linode_region
-  image       = "linode/alpine3.20"
+  image       = var.server_image
   type        = var.server_type
   label       = "${var.project_name}-${count.index + 1}"
   tags        = ["terraform", "${var.project_name}"]

@@ -35,6 +35,12 @@ variable "server_type" {
   default     = "g6-nanode-1"
 }
 
+variable "server_image" {
+  description = "Linode image to use for the servers [OPTIONAL]"
+  type        = string
+  default     = "linode/debian12"
+}
+
 variable "domain_name" {
   description = "Domain name for the cluster [REQUIRED]"
   type        = string

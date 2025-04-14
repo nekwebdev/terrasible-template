@@ -18,6 +18,7 @@
       - iproute2
       - logrotate
       - unattended-upgrades
+      - apt-listchanges
     state: present
   tags: always
 

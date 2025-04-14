@@ -11,6 +11,7 @@ project_name        = "your_project_name"       # Default: project_name
 server_count        = 1                         # Default: 1
 linode_region       = "us-lax"                  # Default: us-lax
 server_type         = "g6-nanode-1"             # Default: g6-nanode-1
+server_image        = "linode/debian12"       # default: linode/debian12
 system_timezone     = "America/Los_Angeles"     # Default: America/Los_Angeles
 vpc_subnet          = "10.10.10"                # Default: 10.10.10
 root_password       = "paste_root_password"     # Required if not using random passwords
